@@ -21,6 +21,7 @@ To use this project you need run backend and frontend parts
 
 ## Project setup
 ```
+cd frontend
 npm install
 ```
 
