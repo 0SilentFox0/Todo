@@ -55,67 +55,57 @@ export default {
       todoText: "",
       todoError: false,
       placeholder: "Put your task",
-      todos: [
-        {
-          id: 1,
-          title:
-            "Go to Market asasdokas'pfjs fkdsfksdlg'gaj'dk jas'gjadf'kgajs'grwegwetgqe efqefkqegkqegekgae'rker",
-          completed: true
-        },
-        {
-          id: 2,
-          title: "Study",
-          completed: false
-        },
-        {
-          id: 3,
-          title: "Sally's books",
-          completed: true
-        },
-        {
-          id: 4,
-          title: "Article",
-          completed: false
-        }
-      ]
+      todos: []
     };
   },
+  created() {
+    this.updateData();
+  },
   methods: {
+    updateData: function() {
+      this.axios.get("api/todos/").then(response => {
+        this.todos = response.data;
+      });
+    },
     addTodo: function() {
-      this.axios
-        .get("/api/todos/")
-        .then(response => {
-          console.log(response);
-        })
-        .catch(error => {
-          console.log(error);
-        });
-      // var data = {
-      //   id: this.todos.length + 1,
-      //   title: this.todoText,
-      //   completed: false
-      // };
-      // console.log(data.id);
-      // if (this.todoText) {
-      //   this.todos.push(data);
-      //   this.todoText = "";
-      //   this.todoError = false;
-      //   this.placeholder = "Put your task";
-      // } else {
-      //   this.todoError = true;
-      //   this.placeholder = "Error!";
-      // }
+      if (this.todoText) {
+        this.axios
+          .post("api/todos/", {
+            id: this.todos.length + 1,
+            title: this.todoText,
+            completed: false
+          })
+          .then(response => {
+            this.updateData();
+            return response;
+          });
+        this.todoText = "";
+        this.todoError = false;
+        this.placeholder = "Put your task";
+      } else {
+        this.todoError = true;
+        this.placeholder = "Error!";
+      }
     },
     deleteTodo: function(id) {
-      this.todos = this.todos.filter(t => t.id !== id);
-      console.log(this.todos.length);
+      this.axios.delete("api/todos/" + id).then(response => {
+        this.updateData();
+        return response;
+      });
     },
     changeStatusTodo: function(todo) {
-      todo.completed = !todo.completed;
-      console.log(todo.id);
+      this.axios
+        .patch("api/todos/" + todo.id + "/", {
+          completed: !todo.completed
+        })
+        .then(response => {
+          this.updateData();
+          return response;
+        });
     },
     deleteAll: function() {
-      this.todos = [];
+      for (let i = 0; i < this.todos.length; i++)
+        this.deleteTodo(this.todos[i].id);
     }
   }
 };
@@ -165,7 +155,7 @@ li {
   margin: 50px 0 10px 10px;
   border: 1px solid #f3f3f3;
   border-radius: 5px;
-  background: transparent;
+  background: #f2f5f3;
   &:focus {
     outline: none;
   }
@@ -173,6 +163,17 @@ li {
 
 label {
   margin-top: 45px;
+}
+
+li {
+  .fa-trash {
+    color: white;
+  }
+  &:hover {
+    .fa-trash {
+      color: black;
+    }
+  }
 }
 
 .error {
