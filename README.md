@@ -11,7 +11,7 @@ To use this project you need run backend and frontend parts
  pipenv install django
  
 ```
-### Run serveer
+### Run server
 ```
   cd backend
   python manage.py runserver
